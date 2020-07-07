@@ -1,0 +1,13 @@
+[package]
+name = "dreamin-graphql"
+version = "0.1.0"
+authors = ["SaltyAom <aomkirby123@mystiar.com>"]
+edition = "2018"
+
+[dependencies]
+actix-web = "2.0.0"
+actix-rt = "1.1.1"
+serde = "1.0.114"
+serde_json = "1.0.56"
+juniper = "0.14.2"
+lazy_static = "1.4.0"
