@@ -21,20 +21,23 @@ pub struct QueryRoot {}
 
 #[juniper::object]
 impl QueryRoot {
+    #[inline(always)]
     fn get_all_menu() -> Vec<Menu> {
         get_menu()
     }
 
+    #[inline(always)]
     fn get_menu_by(name: String) -> Vec<Menu> {
         let search_key = name.to_lowercase();
 
         get_menu()
-            .into_iter()
-            .filter(move |menu| {
+            .iter()
+            .filter(move |&menu| {
                 menu.name.th.to_lowercase().contains(&search_key)
                     || menu.name.en.to_lowercase().contains(&search_key)
                     || menu.name.jp.to_lowercase().contains(&search_key)
             })
+            .cloned()
             .collect()
     }
 }
