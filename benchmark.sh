@@ -1,0 +1,2 @@
+#! /bin/bash
+clear && echo -e "\nNode - Apollo GraphQL\n" && wrk http://127.0.0.1:8081 -d 10 -t 1 -c 20 -s air.lua && echo -e "\n\nRust - Juniper GraphQL\n" && wrk http://127.0.0.1:8080 -d 10 -t 1 -c 20 -s air.lua && echo -e "\n\n"

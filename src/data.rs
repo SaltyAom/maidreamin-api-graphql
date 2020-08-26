@@ -2,7 +2,7 @@ use crate::schema::Menu;
 
 lazy_static! {
     static ref DREAMIN: Vec<Menu> =
-        serde_json::from_str(&include_str!("../static/dreamin.json").to_owned()).unwrap();
+        serde_json::from_str(include_str!("../static/dreamin.json")).unwrap();
 }
 
 #[inline(always)]

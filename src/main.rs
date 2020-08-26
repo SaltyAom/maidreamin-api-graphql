@@ -6,17 +6,21 @@ mod data;
 mod schema;
 
 use std::io;
-use std::sync::Arc;
+use std::sync::{ Arc, Mutex };
+use std::collections::HashMap;
 
-use actix_web::{App, HttpServer, middleware};
+use actix_web::{App, HttpServer, middleware, web::{ Data }};
 
-use schema::create_schema;
+use schema::{ create_schema, Cache };
 
 use route::{ graphiql, graphql };
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
     let schema = Arc::new(create_schema());
+    let graph_context = Data::new(Cache {
+        cache: Mutex::new(HashMap::new())
+    });
 
     HttpServer::new(move || {
         App::new()
@@ -24,6 +28,7 @@ async fn main() -> io::Result<()> {
                 middleware::Compress::default()
             )
             .data(schema.clone())
+            .app_data(graph_context.clone())
             .service(graphql)
             .service(graphiql)
     })

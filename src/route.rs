@@ -5,7 +5,7 @@ use actix_web::{Error, HttpResponse, web, get, post};
 use juniper::http::graphiql::graphiql_source;
 use juniper::http::GraphQLRequest;
 
-use crate::schema::Schema;
+use crate::schema::{ Schema, Cache };
 
 #[get("/graphiql")]
 pub async fn graphiql() -> HttpResponse {
@@ -19,16 +19,17 @@ pub async fn graphiql() -> HttpResponse {
 #[post("/graphql")]
 pub async fn graphql(
     data: web::Data<Arc<Schema>>,
-    request: web::Json<GraphQLRequest>,
+    graph_context: web::Data<Cache>,
+    request: web::Json<GraphQLRequest>
 ) -> Result<HttpResponse, Error> {
     let data = web::block(move || {
-        let res = request.execute(&data, &());
+        let res = request.execute(&data, &graph_context);
 
         Ok::<_, serde_json::error::Error>(serde_json::to_string(&res)?)
     })
     .await?;
-
+    
     Ok(HttpResponse::Ok()
         .content_type("application/json")
-        .body(data))
+        .body(data))    
 }

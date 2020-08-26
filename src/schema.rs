@@ -1,4 +1,7 @@
-use juniper::{EmptyMutation, GraphQLObject, RootNode};
+use std::collections::HashMap;
+use std::sync::Mutex;
+
+use juniper::{Context, GraphQLObject, RootNode};
 use serde::Deserialize;
 
 use crate::data::get_menu;
@@ -17,9 +20,17 @@ pub struct MenuName {
     pub jp: String,
 }
 
+pub struct Cache {
+    pub cache: Mutex<HashMap<String, Vec<Menu>>>,
+}
+
+impl Context for Cache {}
+
 pub struct QueryRoot {}
 
-#[juniper::object]
+#[juniper::object(
+    Context = Cache
+)]
 impl QueryRoot {
     #[inline(always)]
     fn get_all_menu() -> Vec<Menu> {
@@ -27,10 +38,15 @@ impl QueryRoot {
     }
 
     #[inline(always)]
-    fn get_menu_by(name: String) -> Vec<Menu> {
+    fn get_menu_by(context: &mut Cache, name: String) -> Vec<Menu> {
         let search_key = name.to_lowercase();
+        let mut cache = context.cache.lock().unwrap();
 
-        get_menu()
+        if cache.contains_key(&search_key) {
+            return cache.get(&search_key).unwrap().to_vec();
+        }
+
+        let filtered_menu: Vec<Menu> = get_menu()
             .iter()
             .filter(move |&menu| {
                 menu.name.th.to_lowercase().contains(&search_key)
@@ -38,12 +54,23 @@ impl QueryRoot {
                     || menu.name.jp.to_lowercase().contains(&search_key)
             })
             .cloned()
-            .collect()
+            .collect();
+
+        cache.insert(name.to_lowercase(), filtered_menu.to_vec());
+
+        filtered_menu
     }
 }
 
-pub type Schema = RootNode<'static, QueryRoot, EmptyMutation<()>>;
+pub struct Mutation {}
+
+#[juniper::object(
+    Context = Cache
+)]
+impl Mutation {}
+
+pub type Schema = RootNode<'static, QueryRoot, Mutation>;
 
 pub fn create_schema() -> Schema {
-    Schema::new(QueryRoot {}, EmptyMutation::new())
+    Schema::new(QueryRoot {}, Mutation {})
 }
