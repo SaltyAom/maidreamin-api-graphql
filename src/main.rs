@@ -9,7 +9,8 @@ use std::io;
 use std::sync::{ Arc, Mutex };
 use std::collections::HashMap;
 
-use actix_web::{App, HttpServer, middleware, web::{ Data }};
+use actix_web::{http, App, HttpServer, middleware, web::{ Data }};
+use actix_cors::Cors;
 
 use schema::{ create_schema, Cache };
 
@@ -23,10 +24,18 @@ async fn main() -> io::Result<()> {
     });
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allowed_methods(vec!["POST"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(86400);
+
         App::new()
             .wrap(
                 middleware::Compress::default()
             )
+            .wrap(cors)
             .data(schema.clone())
             .app_data(graph_context.clone())
             .service(graphql)

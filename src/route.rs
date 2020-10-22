@@ -12,7 +12,7 @@ pub async fn graphiql() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
-            graphiql_source("http://127.0.0.1:8080/graphql")
+            graphiql_source("http://localhost:8080/graphql", None)
         )
 }
 
@@ -22,14 +22,9 @@ pub async fn graphql(
     graph_context: web::Data<Cache>,
     request: web::Json<GraphQLRequest>
 ) -> Result<HttpResponse, Error> {
-    let data = web::block(move || {
-        let res = request.execute(&data, &graph_context);
-
-        Ok::<_, serde_json::error::Error>(serde_json::to_string(&res)?)
-    })
-    .await?;
+    let res = request.execute(&data, &graph_context).await;
     
     Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .body(data))    
+        .json(res)
+    )
 }

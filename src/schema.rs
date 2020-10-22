@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-use juniper::{Context, GraphQLObject, RootNode};
+use juniper::{Context, EmptyMutation, EmptySubscription, GraphQLObject, RootNode};
 use serde::Deserialize;
 
 use crate::data::get_menu;
@@ -28,7 +28,7 @@ impl Context for Cache {}
 
 pub struct QueryRoot {}
 
-#[juniper::object(
+#[juniper::graphql_object(
     Context = Cache
 )]
 impl QueryRoot {
@@ -62,15 +62,8 @@ impl QueryRoot {
     }
 }
 
-pub struct Mutation {}
-
-#[juniper::object(
-    Context = Cache
-)]
-impl Mutation {}
-
-pub type Schema = RootNode<'static, QueryRoot, Mutation>;
+pub type Schema = RootNode<'static, QueryRoot, EmptyMutation<Cache>, EmptySubscription<Cache>>;
 
 pub fn create_schema() -> Schema {
-    Schema::new(QueryRoot {}, Mutation {})
+    Schema::new(QueryRoot {}, EmptyMutation::new(), EmptySubscription::new())
 }

@@ -5,9 +5,10 @@ authors = ["SaltyAom <aomkirby123@mystiar.com>"]
 edition = "2018"
 
 [dependencies]
-actix-web = "2.0.0"
+actix-web = "3.1.0"
+actix-cors = "0.5.0"
 actix-rt = "1.1.1"
-serde = "1.0.115"
-serde_json = "1.0.57"
-juniper = "0.14.2"
+serde = "1.0.117"
+serde_json = "1.0.59"
+juniper = { git = "https://github.com/graphql-rust/juniper.git" }
 lazy_static = "1.4.0"
