@@ -1,38 +1,26 @@
 use std::sync::Arc;
 
-use actix_web::{Error, HttpResponse, web, get, post};
+use actix_web::{Error, HttpResponse, web, get, post, Result, web::ServiceConfig};
+use actix_files::NamedFile;
 
 use juniper::http::graphiql::graphiql_source;
 use juniper::http::GraphQLRequest;
 
 use crate::schema::{ Schema, Cache };
 
-const INDEX_RESPONSE: &'static str = r#"
-    <!DOCTYPE HTML>
-    <html lang="en">
-        <head>
-            <title>Dreamin GraphQL</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-        </head>
-        <body>
-            <h1>Dreamin GraphQL</h1>
-            <ul>
-                <li>
-                    <a href="/graphiql">/graphiql (GET) - GraphQL Playground</a>
-                </li>
-                <li>
-                    <a href="/graphql">/graphql (POST) - Request Endpoint</a>
-                </li>
-            </ul>
-        </body>
-    </html>
-"#;
-
 #[get("/")]
-pub async fn index() -> HttpResponse {
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(INDEX_RESPONSE)
+pub async fn index() -> Result<NamedFile> {
+    Ok(NamedFile::open("static/index.html")?)
+}
+
+#[get("/vanilla.jpg")]
+pub async fn cover() -> Result<NamedFile> {
+    Ok(NamedFile::open("static/vanilla.jpg")?)
+}
+
+#[get("/icon.png")]
+pub async fn icon() -> Result<NamedFile> {
+    Ok(NamedFile::open("static/icon.png")?)
 }
 
 #[get("/graphiql")]
@@ -55,4 +43,13 @@ pub async fn graphql(
     Ok(HttpResponse::Ok()
         .json(res)
     )
+}
+
+pub fn route_service(config: &mut ServiceConfig) {
+    config
+        .service(index)
+        .service(icon)
+        .service(cover)
+        .service(graphiql)
+        .service(graphql);
 }

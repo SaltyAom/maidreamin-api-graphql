@@ -21,5 +21,6 @@ RUN cargo install --path .
 FROM gcr.io/distroless/cc
 
 COPY --from=build /usr/local/cargo/bin/dreamin-graphql /usr/local/bin/dreamin-graphql
+COPY --from=build /usr/src/dreamin-graphql/static static
 
 CMD ["dreamin-graphql"]

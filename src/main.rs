@@ -14,9 +14,9 @@ use actix_cors::Cors;
 
 use schema::{ create_schema, Cache };
 
-use route::{ index, graphiql, graphql };
+use route::route_service;
 
-#[actix_rt::main]
+#[actix_web::main]
 async fn main() -> io::Result<()> {
     let schema = Arc::new(create_schema());
     let graph_context = Data::new(Cache {
@@ -38,9 +38,7 @@ async fn main() -> io::Result<()> {
             .wrap(cors)
             .data(schema.clone())
             .app_data(graph_context.clone())
-            .service(index)
-            .service(graphql)
-            .service(graphiql)
+            .configure(route_service)
     })
     .bind("0.0.0.0:8080")?
     .run()
