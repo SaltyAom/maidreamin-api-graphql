@@ -14,7 +14,7 @@ use actix_cors::Cors;
 
 use schema::{ create_schema, Cache };
 
-use route::{ graphiql, graphql };
+use route::{ index, graphiql, graphql };
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
@@ -38,6 +38,7 @@ async fn main() -> io::Result<()> {
             .wrap(cors)
             .data(schema.clone())
             .app_data(graph_context.clone())
+            .service(index)
             .service(graphql)
             .service(graphiql)
     })
