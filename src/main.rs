@@ -26,9 +26,9 @@ async fn main() -> io::Result<()> {
     HttpServer::new(move || {
         let cors = Cors::default()
             .allow_any_origin()
+            .send_wildcard()
             .allowed_methods(vec!["POST"])
-            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-            .allowed_header(http::header::CONTENT_TYPE)
+            .allowed_headers(vec![http::header::CONTENT_TYPE, http::header::ACCEPT])
             .max_age(86400);
 
         App::new()

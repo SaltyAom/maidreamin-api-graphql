@@ -18,7 +18,7 @@ COPY . .
 RUN cargo install --path .
 
 # Runtime
-FROM gcr.io/distroless/cc-debian10
+FROM gcr.io/distroless/cc
 
 COPY --from=build /usr/local/cargo/bin/dreamin-graphql /usr/local/bin/dreamin-graphql
 
