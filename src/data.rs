@@ -7,5 +7,5 @@ lazy_static! {
 
 #[inline(always)]
 pub fn get_menu() -> Vec<Menu> {
-    DREAMIN.to_vec()
+    DREAMIN.to_owned()
 }

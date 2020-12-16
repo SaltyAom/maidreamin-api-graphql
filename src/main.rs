@@ -6,8 +6,8 @@ mod data;
 mod schema;
 
 use std::io;
-use std::sync::{ Arc, Mutex };
-use std::collections::HashMap;
+use std::sync::{ Arc, RwLock };
+use hashbrown::HashMap;
 
 use actix_web::{http, App, HttpServer, middleware, web::{ Data }};
 use actix_cors::Cors;
@@ -20,7 +20,7 @@ use route::route_service;
 async fn main() -> io::Result<()> {
     let schema = Arc::new(create_schema());
     let graph_context = Data::new(Cache {
-        cache: Mutex::new(HashMap::new())
+        cache: RwLock::new(HashMap::new())
     });
 
     HttpServer::new(move || {
