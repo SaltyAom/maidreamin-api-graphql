@@ -1,2 +1,3 @@
 .DS_Store
-target
+code/target
+infra/node_modules
